@@ -30,7 +30,7 @@
 # limitations under the License.
 
 # Modified from https://github.com/OpenDriveLab/UniAD/blob/main/tools/test.py
-# Added support for launching ONNX exportation for UniAD-tiny model
+# Added support for launching ONNX exportation for UniAD-tiny and full-size models
 
 import argparse
 import torch
@@ -248,21 +248,36 @@ def main():
     # ########## ONNX Export Starts###############
     onnx_folder = "./onnx/"
     folder_dat = './dumped_inputs/'
-    onnx_file_name = onnx_folder+"uniad_tiny_imgx0.25_cp.onnx"
     onnx_export_input = './nuscenes_np/uniad_onnx_input/'
     onnx_export_output = './nuscenes_np/uniad_pth_trtp_out/'
-    if 'tiny' in onnx_file_name:
-        bevh=50
-        img_h = 480
-        img_w = 800
-        print('bevh=', bevh)
-        if 'x0.25' in onnx_file_name:
-            img_h = 256
-            img_w = 416
+
+    # Derive model dimensions from the config instead of hardcoding
+    bevh = cfg.bev_h_ if hasattr(cfg, 'bev_h_') else cfg.model.pts_bbox_head.bev_h
+    bevw = cfg.bev_w_ if hasattr(cfg, 'bev_w_') else cfg.model.pts_bbox_head.bev_w
+    assert bevh == bevw, f"Non-square BEV not supported for export: bev_h={bevh}, bev_w={bevw}"
+
+    # Determine image size from the data pipeline
+    # Check for RandomScaleImageMultiViewImage in test pipeline to detect scaling
+    img_scale_factor = 1.0
+    for transform in cfg.data.test.pipeline:
+        if isinstance(transform, dict) and transform.get('type') == 'MultiScaleFlipAug3D':
+            for t in transform.get('transforms', []):
+                if isinstance(t, dict) and t.get('type') == 'RandomScaleImageMultiViewImage':
+                    img_scale_factor = t['scales'][0]
+    # Base nuScenes image size
+    base_img_h, base_img_w = 928, 1600
+    img_h = int(base_img_h * img_scale_factor)
+    img_w = int(base_img_w * img_scale_factor)
+    # Ensure divisible by 32 (PadMultiViewImage size_divisor)
+    img_h = int(np.ceil(img_h / 32) * 32)
+    img_w = int(np.ceil(img_w / 32) * 32)
+
+    if bevh == 50:
+        onnx_file_name = onnx_folder + "uniad_tiny_imgx{}_cp.onnx".format(img_scale_factor)
     else:
-        bevh=200
-        img_h = 928
-        img_w = 1600
+        onnx_file_name = onnx_folder + "uniad_full_cp.onnx"
+    print(f'Export config: bevh={bevh}, img_h={img_h}, img_w={img_w}, scale={img_scale_factor}')
+    print(f'ONNX output: {onnx_file_name}')
 
     torch.random.manual_seed(0)
     model=model.cuda()

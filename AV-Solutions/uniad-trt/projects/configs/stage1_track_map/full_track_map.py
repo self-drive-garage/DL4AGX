@@ -75,7 +75,7 @@ _feed_dim_ = _ffn_dim_
 _dim_half_ = _pos_dim_
 canvas_size = (bev_h_, bev_w_)
 
-queue_length = 5  # each sequence contains `queue_length` frames.
+queue_length = 3  # each sequence contains `queue_length` frames. (reduced from 5 to fit A40 46GB)
 
 ### traj prediction args ###
 predict_steps = 12

@@ -133,7 +133,7 @@ docker exec ${TRAINING_CONTAINER} bash -c "
   cd /workspace/uniad-trt/${DEPLOY_DIR} &&
   CUDA_VISIBLE_DEVICES=0 ./tools/uniad_export_onnx.sh \
     ${CONFIG} \
-    ${CKPT_DST} \
+    ./ckpts/full_e2e_ep${EPOCH}.pth \
     1
 "
 echo "  → ONNX exported: ${ONNX_FILE}"

@@ -56,11 +56,11 @@ struct KernelParams {
     {"prev_timestamp", {1}},
     {"prev_l2g_r_mat", {1, 3, 3}},
     {"prev_l2g_t", {1, 3}},
-    {"prev_bev", {2500, 1, 256}},
+    {"prev_bev", {40000, 1, 256}},
     {"timestamp", {1}},
     {"l2g_r_mat", {1, 3, 3}},
     {"l2g_t", {1, 3}},
-    {"img", {1, 6, 3, 256, 416}},
+    {"img", {1, 6, 3, 928, 1600}},
     {"img_metas_can_bus", {18}},
     {"img_metas_lidar2img", {1, 6, 4, 4}},
     {"command", {1}},
@@ -108,7 +108,7 @@ struct KernelParams {
     {"prev_timestamp_out", {1}},
     {"prev_l2g_r_mat_out", {1, 3, 3}},
     {"prev_l2g_t_out", {1, 3}},
-    {"bev_embed", {2500, 1, 256}},
+    {"bev_embed", {40000, 1, 256}},
     {"bboxes_dict_bboxes", {TRACK_MAX, 9}},
     {"scores", {TRACK_MAX}},
     {"labels", {TRACK_MAX}},
@@ -116,7 +116,7 @@ struct KernelParams {
     {"obj_idxes", {TRACK_MAX}},
     {"max_obj_id_out", {1}},
     {"outs_planning", {1, 6, 2}},
-    {"seg_out", {1, 5, 1, 50, 50}}
+    {"seg_out", {1, 5, 1, 200, 200}}
   };
 };
 
@@ -135,11 +135,11 @@ struct KernelInput {
   std::vector<float> prev_timestamp = std::vector<float>(1, 0);
   std::vector<float> prev_l2g_r_mat = std::vector<float>(1*3*3, 0);
   std::vector<float> prev_l2g_t = std::vector<float>(1*3, 0);
-  std::vector<float> prev_bev = std::vector<float>(2500*1*256, 0);
+  std::vector<float> prev_bev = std::vector<float>(40000*1*256, 0);
   std::vector<float> timestamp = std::vector<float>(1);
   std::vector<float> l2g_r_mat = std::vector<float>(1*3*3);
   std::vector<float> l2g_t = std::vector<float>(1*3);
-  std::vector<float> img = std::vector<float>(1*6*3*256*416);
+  std::vector<float> img = std::vector<float>(1*6*3*928*1600);
   std::vector<float> img_metas_can_bus = std::vector<float>(18);
   std::vector<float> img_metas_lidar2img = std::vector<float>(1*6*4*4);
   std::vector<float> command = std::vector<float>(1);
@@ -187,7 +187,7 @@ struct KernelInput {
     {"prev_timestamp", {1}},
     {"prev_l2g_r_mat", {1, 3, 3}},
     {"prev_l2g_t", {1, 3}},
-    {"prev_bev", {2500, 1, 256}},
+    {"prev_bev", {40000, 1, 256}},
     {"use_prev_bev", {1}},
     {"max_obj_id", {1}}
   };
@@ -208,7 +208,7 @@ struct KernelOutput {
   std::vector<float> prev_timestamp_out = std::vector<float>(1);
   std::vector<float> prev_l2g_r_mat_out = std::vector<float>(1*3*3);
   std::vector<float> prev_l2g_t_out = std::vector<float>(1*3);
-  std::vector<float> bev_embed = std::vector<float>(2500*1*256);
+  std::vector<float> bev_embed = std::vector<float>(40000*1*256);
   std::vector<float> bboxes_dict_bboxes = std::vector<float>(TRACK_MAX*9);
   std::vector<float> scores = std::vector<float>(TRACK_MAX);
   std::vector<int32_t> labels = std::vector<int32_t>(TRACK_MAX);
@@ -216,7 +216,7 @@ struct KernelOutput {
   std::vector<int32_t> obj_idxes = std::vector<int32_t>(TRACK_MAX);
   std::vector<int32_t> max_obj_id_out = std::vector<int32_t>(1);
   std::vector<float> outs_planning = std::vector<float>(1*6*2);
-  std::vector<int32_t> seg_out = std::vector<int32_t>(1*5*1*50*50);
+  std::vector<int32_t> seg_out = std::vector<int32_t>(1*5*1*200*200);
 
   std::unordered_map<std::string, void*> data_ptrs = {
     {"prev_track_intances0_out", prev_track_intances0_out.data()},

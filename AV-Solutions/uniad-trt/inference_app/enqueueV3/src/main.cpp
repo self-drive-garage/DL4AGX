@@ -323,7 +323,9 @@ int main(int argc, char** argv) {
     int original_width, original_height, original_channel;
     auto images_dummy = load_images(infos, 0, original_width, original_height, original_channel);
     free_images(images_dummy);
-    std::shared_ptr<ImgPreProcess> pre_processor = std::make_shared<ImgPreProcess>(original_width, original_height, original_channel, 0.25, 32);
+    // resize_scale: 0.25 for tiny model (256x416), 1.0 for full model (928x1600)
+    float resize_scale = 1.0;
+    std::shared_ptr<ImgPreProcess> pre_processor = std::make_shared<ImgPreProcess>(original_width, original_height, original_channel, resize_scale, 32);
     for (int imageid=0; imageid<num_frames; ++imageid) {
         auto images = load_images(infos, imageid);
         inputs[imageid].img = pre_processor->img_pre_processing(images, stream);
